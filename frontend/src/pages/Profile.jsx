@@ -7,6 +7,7 @@ import {
 import { ArrowBack, Edit, Settings, Message } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { userAPI, postAPI } from '../services/api';
+import { getMediaUrl } from '../utils/media';
 
 export default function Profile() {
   const { id } = useParams();
@@ -246,9 +247,9 @@ export default function Profile() {
             {post.media && (
               <Box sx={{ borderRadius: '4px', overflow: 'hidden', mt: 1.5 }}>
                 {post.mediaType === 'video' ? (
-                  <video src={post.media} controls style={{ width: '100%', maxHeight: 400, display: 'block' }} />
+                  <video src={getMediaUrl(post.media)} controls style={{ width: '100%', maxHeight: 400, display: 'block' }} />
                 ) : (
-                  <img src={post.media} alt="Post" style={{ width: '100%', maxHeight: 400, objectFit: 'cover', display: 'block' }} />
+                  <img src={getMediaUrl(post.media)} alt="Post" style={{ width: '100%', maxHeight: 400, objectFit: 'cover', display: 'block' }} />
                 )}
               </Box>
             )}

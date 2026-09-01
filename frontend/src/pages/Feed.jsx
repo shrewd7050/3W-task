@@ -10,6 +10,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { postAPI } from '../services/api';
+import { getMediaUrl } from '../utils/media';
 
 const FILTER_OPTIONS = ['All Post', 'For You', 'Most Liked', 'Most Commented'];
 
@@ -300,9 +301,9 @@ export default function Feed() {
             {post.media && (
               <Box sx={{ borderRadius: '4px', overflow: 'hidden', mb: 1 }}>
                 {post.mediaType === 'video' ? (
-                  <video src={post.media} controls style={{ width: '100%', maxHeight: 400, display: 'block' }} />
+                  <video src={getMediaUrl(post.media)} controls style={{ width: '100%', maxHeight: 400, display: 'block' }} />
                 ) : (
-                  <img src={post.media} alt="Post" style={{ width: '100%', maxHeight: 400, objectFit: 'cover', display: 'block' }} />
+                  <img src={getMediaUrl(post.media)} alt="Post" style={{ width: '100%', maxHeight: 400, objectFit: 'cover', display: 'block' }} />
                 )}
               </Box>
             )}
