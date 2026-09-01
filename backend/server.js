@@ -13,7 +13,7 @@ const app = express();
 
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-  : ['http://localhost:3000'];
+  : ['http://localhost:3000', 'https://3-w-task-delta.vercel.app'];
 
 app.use(cors({
   origin: (origin, callback) => {
