@@ -49,7 +49,7 @@ export default function Login() {
               TaskPlanet
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Connect with the universe
+              Trial-Task demo site
             </Typography>
           </Box>
 
