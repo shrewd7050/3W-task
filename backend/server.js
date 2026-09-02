@@ -83,6 +83,9 @@ async function startServer() {
   try {
     console.log('MongoDB URI present:', !!process.env.MONGODB_URI);
     console.log('JWT SECRET present:', !!process.env.JWT_SECRET);
+    console.log('CLOUDINARY_CLOUD_NAME present:', !!process.env.CLOUDINARY_CLOUD_NAME);
+    console.log('CLOUDINARY_API_KEY present:', !!process.env.CLOUDINARY_API_KEY);
+    console.log('CLOUDINARY_API_SECRET present:', !!process.env.CLOUDINARY_API_SECRET);
     console.log('Connecting to MongoDB...');
 
     await mongoose.connect(process.env.MONGODB_URI, {

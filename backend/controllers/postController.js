@@ -6,7 +6,10 @@ exports.createPost = async (req, res) => {
     let media = '';
     let mediaType = '';
 
+    console.log('CREATE POST: file received:', !!req.file);
     if (req.file) {
+      console.log('CREATE POST: file.path (Cloudinary URL):', req.file.path);
+      console.log('CREATE POST: file.mimetype:', req.file.mimetype);
       media = req.file.path;
       mediaType = req.file.mimetype.startsWith('video') ? 'video' : 'image';
     }
@@ -15,8 +18,10 @@ exports.createPost = async (req, res) => {
     await post.save();
     await post.populate('user', 'username avatar');
 
+    console.log('CREATE POST: saved media value:', post.media);
     res.status(201).json(post);
   } catch (error) {
+    console.error('CREATE POST ERROR:', error.message);
     res.status(500).json({ error: error.message });
   }
 };
