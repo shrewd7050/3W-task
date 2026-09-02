@@ -1,3 +1,10 @@
+const dns = require('dns');
+
+dns.setServers([
+  '8.8.8.8',
+  '8.8.4.4'
+]);
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -25,14 +32,13 @@ app.use(cors({
   },
   credentials: true
 }));
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
-
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB Atlas'))
-  .catch(err => console.error('MongoDB connection error:', err));
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
@@ -40,4 +46,32 @@ app.use('/api/users', userRoutes);
 app.use('/api/messages', messageRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+async function startServer() {
+  try {
+    console.log('MongoDB URI present:', !!process.env.MONGODB_URI);
+    console.log('Connecting to MongoDB...');
+
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+    });
+
+    console.log('✅ Connected to MongoDB Atlas');
+    console.log('Database:', mongoose.connection.name);
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+
+  } catch (err) {
+    console.error('❌ MongoDB connection failed');
+    console.error('Error code:', err.code);
+    console.error('Error message:', err.message);
+    console.error('Full error:', err);
+
+    process.exit(1);
+  }
+}
+
+startServer();
