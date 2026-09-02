@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container, Paper, TextField, Button, Box, Avatar, IconButton,
@@ -25,6 +25,8 @@ export default function Feed() {
   const [error, setError] = useState('');
   const [activeFilter, setActiveFilter] = useState(0);
   const [showCreatePost, setShowCreatePost] = useState(false);
+  const mediaInputRef = useRef(null);
+  const videoInputRef = useRef(null);
 
   useEffect(() => { loadPosts(); }, []);
 
@@ -171,18 +173,14 @@ export default function Feed() {
             )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box>
-                <input type="file" accept="image/*,video/*" hidden id="media-input" onChange={handleMediaChange} />
-                <label htmlFor="media-input">
-                  <IconButton component="span" sx={{ color: '#2196F3', bgcolor: '#E3F2FD', mr: 1, '&:hover': { bgcolor: '#BBDEFB' } }}>
-                    <PhotoCamera />
-                  </IconButton>
-                </label>
-                <input type="file" accept="video/*" hidden id="video-input" onChange={handleMediaChange} />
-                <label htmlFor="video-input">
-                  <IconButton component="span" sx={{ color: '#FF9800', bgcolor: '#FFF3E0', '&:hover': { bgcolor: '#FFE0B2' } }}>
-                    <Videocam />
-                  </IconButton>
-                </label>
+                <input type="file" accept="image/*,video/*" hidden ref={mediaInputRef} onChange={handleMediaChange} />
+                <IconButton onClick={() => mediaInputRef.current?.click()} sx={{ color: '#2196F3', bgcolor: '#E3F2FD', mr: 1, '&:hover': { bgcolor: '#BBDEFB' } }}>
+                  <PhotoCamera />
+                </IconButton>
+                <input type="file" accept="video/*" hidden ref={videoInputRef} onChange={handleMediaChange} />
+                <IconButton onClick={() => videoInputRef.current?.click()} sx={{ color: '#FF9800', bgcolor: '#FFF3E0', '&:hover': { bgcolor: '#FFE0B2' } }}>
+                  <Videocam />
+                </IconButton>
               </Box>
               <Button
                 variant="contained"

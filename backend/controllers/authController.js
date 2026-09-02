@@ -17,20 +17,15 @@ exports.register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    console.log('🔍 Checking if user already exists...');
+    console.log('🔍 Checking if username already exists...');
 
-    const existingUser = await User.findOne({
-      $or: [
-        { email },
-        { username }
-      ]
-    });
+    const existingUser = await User.findOne({ username });
 
     if (existingUser) {
-      console.log('⚠️ User already exists');
+      console.log('⚠️ Username already taken');
 
       return res.status(400).json({
-        error: 'User already exists'
+        error: 'Username already taken. Please change your username.'
       });
     }
 

@@ -7,7 +7,7 @@ exports.createPost = async (req, res) => {
     let mediaType = '';
 
     if (req.file) {
-      media = `/uploads/${req.file.filename}`;
+      media = req.file.path;
       mediaType = req.file.mimetype.startsWith('video') ? 'video' : 'image';
     }
 
