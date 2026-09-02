@@ -3,20 +3,26 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
+  console.log('🔥 REGISTER REQUEST RECEIVED');
+
+  console.log('Body:', {
+    username: req.body?.username,
+    email: req.body?.email,
+    hasPassword: !!req.body?.password
+  });
+
   try {
-    const { username, email, password } = req.body;
+    // ⬇️ KEEP YOUR EXISTING REGISTER CODE HERE
 
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
-    await user.save();
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.status(201).json({ token, user: { id: user._id, username: user.username, email: user.email, avatar: user.avatar } });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('🔥 REGISTER ERROR:', error);
+    console.error('Message:', error.message);
+    console.error('Stack:', error.stack);
+
+    res.status(500).json({
+      error: error.message
+    });
   }
 };
 
