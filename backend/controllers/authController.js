@@ -1,7 +1,9 @@
-
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
+
+// ==================== REGISTER ====================
 
 exports.register = async (req, res) => {
   console.log('🔥 REGISTER REQUEST RECEIVED');
@@ -18,7 +20,10 @@ exports.register = async (req, res) => {
     console.log('🔍 Checking if user already exists...');
 
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
+      $or: [
+        { email },
+        { username }
+      ]
     });
 
     if (existingUser) {
@@ -79,13 +84,19 @@ exports.register = async (req, res) => {
 };
 
 
+// ==================== LOGIN ====================
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log('🔐 LOGIN REQUEST:', email);
+
     let user = await User.findOne({ email });
 
     if (!user) {
+      console.log('👤 User not found. Creating user...');
+
       const username = email.split('@')[0];
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -97,6 +108,8 @@ exports.login = async (req, res) => {
       });
 
       await user.save();
+
+      console.log('✅ New user created');
 
       const token = jwt.sign(
         { userId: user._id },
@@ -148,6 +161,7 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     console.error('🔥 LOGIN ERROR:', error);
+    console.error('Message:', error.message);
 
     return res.status(500).json({
       error: error.message
@@ -155,6 +169,8 @@ exports.login = async (req, res) => {
   }
 };
 
+
+// ==================== GET ME ====================
 
 exports.getMe = async (req, res) => {
   try {
@@ -171,10 +187,10 @@ exports.getMe = async (req, res) => {
 
   } catch (error) {
     console.error('🔥 GET ME ERROR:', error);
+    console.error('Message:', error.message);
 
     return res.status(500).json({
       error: error.message
     });
   }
 };
-```
