@@ -1,3 +1,4 @@
+```js
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -12,45 +13,168 @@ exports.register = async (req, res) => {
   });
 
   try {
-    // ⬇️ KEEP YOUR EXISTING REGISTER CODE HERE
+    const { username, email, password } = req.body;
 
+    console.log('🔍 Checking if user already exists...');
+
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (existingUser) {
+      console.log('⚠️ User already exists');
+
+      return res.status(400).json({
+        error: 'User already exists'
+      });
+    }
+
+    console.log('🔐 Hashing password...');
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    console.log('👤 Creating user...');
+
+    const user = new User({
+      username,
+      email,
+      password: hashedPassword
+    });
+
+    await user.save();
+
+    console.log('✅ User saved to MongoDB');
+
+    console.log('🔑 Creating JWT...');
+
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '7d'
+      }
+    );
+
+    console.log('✅ JWT created');
+
+    return res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar
+      }
+    });
 
   } catch (error) {
     console.error('🔥 REGISTER ERROR:', error);
     console.error('Message:', error.message);
     console.error('Stack:', error.stack);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: error.message
     });
   }
 };
+
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     let user = await User.findOne({ email });
+
     if (!user) {
       const username = email.split('@')[0];
+
       const hashedPassword = await bcrypt.hash(password, 10);
-      user = new User({ username, email, password: hashedPassword });
+
+      user = new User({
+        username,
+        email,
+        password: hashedPassword
+      });
+
       await user.save();
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-      return res.status(201).json({ token, user: { id: user._id, username: user.username, email: user.email, avatar: user.avatar } });
+
+      const token = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: '7d'
+        }
+      );
+
+      return res.status(201).json({
+        token,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar
+        }
+      });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, username: user.username, email: user.email, avatar: user.avatar } });
+    if (!isMatch) {
+      return res.status(400).json({
+        error: 'Invalid credentials'
+      });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '7d'
+      }
+    );
+
+    return res.json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar
+      }
+    });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('🔥 LOGIN ERROR:', error);
+
+    return res.status(500).json({
+      error: error.message
+    });
   }
 };
 
+
 exports.getMe = async (req, res) => {
-  const u = req.user;
-  res.json({ user: { id: u._id, username: u.username, email: u.email, avatar: u.avatar } });
+  try {
+    const u = req.user;
+
+    return res.json({
+      user: {
+        id: u._id,
+        username: u.username,
+        email: u.email,
+        avatar: u.avatar
+      }
+    });
+
+  } catch (error) {
+    console.error('🔥 GET ME ERROR:', error);
+
+    return res.status(500).json({
+      error: error.message
+    });
+  }
 };
+```
